@@ -9,7 +9,7 @@ app.use(express.json());
 app.get('/api', (req, res) => {
   attempt++;
   console.log(`Attempt ${attempt} to Service B`);
-  if (attempt % 3 !== 0) { // Chỉ thành công sau 3 lần thử
+  if (attempt % 5 !== 0) { // Chỉ thành công sau 5 lần thử
     res.status(500).json({ message: "Service B failed, please retry" });
   } else {
     attempt = 0;

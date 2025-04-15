@@ -24,9 +24,9 @@ app.get('/api', async (req, res) => {
         }
       },
       {
-        retries: 3,
+        retries: 5,
         minTimeout: 1000,
-        maxTimeout: 5000,
+        maxTimeout: 2000,
       }
     );
     res.json(result);

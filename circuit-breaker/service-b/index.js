@@ -8,10 +8,10 @@ app.use(express.json());
 
 app.get('/api', (req, res) => {
   if (shouldFail == 5) {
-    shouldFail ++; // Đổi trạng thái cho lần request tiếp theo
+    shouldFail=0; // Đổi trạng thái cho lần request tiếp theo
     res.status(500).json({ message: "Service B failed intentionally" });
   } else {
-    shouldFail = !shouldFail;
+    shouldFail ++;
     res.json({ message: "Hello from Service B" });
   }
 });
