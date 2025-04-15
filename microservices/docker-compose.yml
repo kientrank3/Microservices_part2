@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - PAYMENT_SERVICE_URL=http://payment-service:3001
+      - INVENTORY_SERVICE_URL=http://inventory-service:3002
+      - SHIPPING_SERVICE_URL=http://shipping-service:3003
+    depends_on:
+      - payment-service
+      - inventory-service
+      - shipping-service
+    networks:
+      - microservices-network
+    restart: always
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    networks:
+      - microservices-network
+    restart: always
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+    networks:
+      - microservices-network
+    restart: always
+
+  shipping-service:
+    build: ./shipping-service
+    container_name: shipping-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+    networks:
+      - microservices-network
+    restart: always
+
+networks:
+  microservices-network:
+    driver: bridge

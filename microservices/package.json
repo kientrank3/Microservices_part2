@@ -1,0 +1,18 @@
+{
+  "name": "microservices-demo",
+  "version": "1.0.0",
+  "description": "Microservices with Fault Tolerance Patterns Demo",
+  "scripts": {
+    "start": "docker-compose up --build",
+    "stop": "docker-compose down",
+    "test": "node test-fault-tolerance.js"
+  },
+  "dependencies": {
+    "axios": "^1.8.4"
+  },
+  "main": "test-fault-tolerance.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

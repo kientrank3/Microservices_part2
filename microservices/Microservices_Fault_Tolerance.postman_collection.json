@@ -1,0 +1,710 @@
+{
+	"info": {
+		"_postman_id": "e5a7b8c9-d0f1-4e23-a6b7-c8d9e0f1a2b3",
+		"name": "Microservices Fault Tolerance",
+		"description": "A collection for testing the microservices with fault tolerance patterns",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "API Gateway",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check the health of all services"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        { \"productId\": \"prod-001\", \"quantity\": 1 },\n        { \"productId\": \"prod-002\", \"quantity\": 2 }\n    ],\n    \"payment\": {\n        \"currency\": \"USD\",\n        \"method\": \"credit_card\"\n    },\n    \"shippingAddress\": {\n        \"street\": \"123 Test St\",\n        \"city\": \"Test City\",\n        \"zipCode\": \"12345\",\n        \"country\": \"Test Country\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"orders"
+							]
+						},
+						"description": "Create a new order that coordinates between all services"
+					},
+					"response": []
+				}
+			],
+			"description": "API Gateway endpoints"
+		},
+		{
+			"name": "Payment Service",
+			"item": [
+				{
+					"name": "Process Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"test-order-{{$timestamp}}\",\n    \"amount\": 100,\n    \"currency\": \"USD\",\n    \"method\": \"credit_card\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/payments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"payments"
+							]
+						},
+						"description": "Process a payment (Circuit Breaker pattern)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment by Order ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/payments/:orderId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"payments",
+								":orderId"
+							],
+							"variable": [
+								{
+									"key": "orderId",
+									"value": "test-order-123",
+									"description": "Replace with an actual order ID"
+								}
+							]
+						},
+						"description": "Get payment details for an order"
+					},
+					"response": []
+				},
+				{
+					"name": "Circuit Breaker Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"test-order-{{$timestamp}}\",\n    \"amount\": 100,\n    \"currency\": \"USD\",\n    \"method\": \"credit_card\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/payments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"payments"
+							]
+						},
+						"description": "Make multiple requests to test circuit breaker (run this multiple times)"
+					},
+					"response": []
+				}
+			],
+			"description": "Payment Service endpoints"
+		},
+		{
+			"name": "Inventory Service",
+			"item": [
+				{
+					"name": "Get All Inventory",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/inventory",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inventory"
+							]
+						},
+						"description": "Get all inventory items (Time Limiter pattern)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/inventory/:productId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inventory",
+								":productId"
+							],
+							"variable": [
+								{
+									"key": "productId",
+									"value": "prod-001",
+									"description": "Product ID to retrieve"
+								}
+							]
+						},
+						"description": "Get a specific inventory item (Retry pattern)"
+					},
+					"response": []
+				},
+				{
+					"name": "Check Inventory",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        { \"productId\": \"prod-001\", \"quantity\": 1 },\n        { \"productId\": \"prod-002\", \"quantity\": 2 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/inventory/check",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inventory",
+								"check"
+							]
+						},
+						"description": "Check if items are available in inventory"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Inventory",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"test-order-{{$timestamp}}\",\n    \"items\": [\n        { \"productId\": \"prod-001\", \"quantity\": 1 },\n        { \"productId\": \"prod-002\", \"quantity\": 1 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/inventory/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inventory",
+								"update"
+							]
+						},
+						"description": "Update inventory for an order (Retry pattern)"
+					},
+					"response": []
+				}
+			],
+			"description": "Inventory Service endpoints"
+		},
+		{
+			"name": "Shipping Service",
+			"item": [
+				{
+					"name": "Create Shipment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"test-order-{{$timestamp}}\",\n    \"address\": {\n        \"street\": \"123 Test St\",\n        \"city\": \"Test City\",\n        \"zipCode\": \"12345\",\n        \"country\": \"Test Country\"\n    },\n    \"items\": [\n        { \"productId\": \"prod-001\", \"quantity\": 1 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/shipping",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"shipping"
+							]
+						},
+						"description": "Create a new shipment (Rate Limiter pattern)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shipment by Order ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/shipping/:orderId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"shipping",
+								":orderId"
+							],
+							"variable": [
+								{
+									"key": "orderId",
+									"value": "test-order-123",
+									"description": "Replace with an actual order ID"
+								}
+							]
+						},
+						"description": "Get shipment details for an order"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shipment Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"SHIPPED\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/shipping/:orderId/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"shipping",
+								":orderId",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "orderId",
+									"value": "test-order-123",
+									"description": "Replace with an actual order ID"
+								}
+							]
+						},
+						"description": "Update shipment status"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Limiter Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Store the current timestamp to use in the next request",
+									"var timestamp = new Date().getTime();",
+									"pm.globals.set(\"timestamp\", timestamp);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"test-order-{{$timestamp}}\",\n    \"address\": {\n        \"street\": \"123 Test St\",\n        \"city\": \"Test City\",\n        \"zipCode\": \"12345\",\n        \"country\": \"Test Country\"\n    },\n    \"items\": [\n        { \"productId\": \"prod-001\", \"quantity\": 1 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/shipping",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"shipping"
+							]
+						},
+						"description": "Make multiple requests to test rate limiter (run this multiple times in quick succession)"
+					},
+					"response": []
+				}
+			],
+			"description": "Shipping Service endpoints"
+		},
+		{
+			"name": "Direct Service Access",
+			"item": [
+				{
+					"name": "Payment Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"health"
+							]
+						},
+						"description": "Direct health check for Payment Service"
+					},
+					"response": []
+				},
+				{
+					"name": "Inventory Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3002/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"health"
+							]
+						},
+						"description": "Direct health check for Inventory Service"
+					},
+					"response": []
+				},
+				{
+					"name": "Shipping Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3003/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"health"
+							]
+						},
+						"description": "Direct health check for Shipping Service"
+					},
+					"response": []
+				}
+			],
+			"description": "Direct access to individual services (bypassing API Gateway)"
+		},
+		{
+			"name": "Fault Tolerance Tests",
+			"item": [
+				{
+					"name": "Circuit Breaker Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Store the response",
+									"var response = pm.response.json();",
+									"",
+									"// Check if circuit breaker is activated",
+									"if (response.message && response.message.includes('Circuit Breaker activated')) {",
+									"    pm.test(\"Circuit Breaker activated\", function() {",
+									"        pm.expect(response.message).to.include('Circuit Breaker activated');",
+									"    });",
+									"} else {",
+									"    pm.test(\"Normal response received\", function() {",
+									"        pm.expect(response).to.be.an('object');",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"test-order-{{$timestamp}}\",\n    \"amount\": 100,\n    \"currency\": \"USD\",\n    \"method\": \"credit_card\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/payments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"payments"
+							]
+						},
+						"description": "Run this multiple times to test circuit breaker"
+					},
+					"response": []
+				},
+				{
+					"name": "Retry Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Check if we got a successful response after retries",
+									"pm.test(\"Response received after retries\", function() {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 500]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/inventory/prod-001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inventory",
+								"prod-001"
+							]
+						},
+						"description": "Test retry pattern with inventory service"
+					},
+					"response": []
+				},
+				{
+					"name": "Time Limiter Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Check if we got a timeout or successful response",
+									"pm.test(\"Response received or timed out\", function() {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 504]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/inventory",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inventory"
+							]
+						},
+						"description": "Test time limiter pattern with inventory service"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Limiter Test (Run Collection)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// This is a special test that should be run as part of a collection runner",
+									"// to make multiple requests in quick succession",
+									"",
+									"// Store the response status",
+									"var status = pm.response.code;",
+									"",
+									"// Check if rate limiter kicked in (429 Too Many Requests)",
+									"if (status === 429) {",
+									"    pm.test(\"Rate limiter activated\", function() {",
+									"        pm.expect(status).to.equal(429);",
+									"    });",
+									"} else {",
+									"    pm.test(\"Normal response received\", function() {",
+									"        pm.expect(status).to.equal(201);",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"test-order-{{$timestamp}}\",\n    \"address\": {\n        \"street\": \"123 Test St\",\n        \"city\": \"Test City\",\n        \"zipCode\": \"12345\",\n        \"country\": \"Test Country\"\n    },\n    \"items\": [\n        { \"productId\": \"prod-001\", \"quantity\": 1 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/shipping",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"shipping"
+							]
+						},
+						"description": "Run this in the Collection Runner with multiple iterations to test rate limiter"
+					},
+					"response": []
+				}
+			],
+			"description": "Tests specifically designed to trigger fault tolerance patterns"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
